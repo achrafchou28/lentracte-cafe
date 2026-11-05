@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Entracte | Café Littéraire, Sanctuaire d'Étude & Club de Jeux</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display for literary elegance, Inter for modern startup UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        espresso: '#1C1613',
+                        roast: '#2D241E',
+                        parchment: '#F7F4EF',
+                        cream: '#EDE6D9',
+                        forest: '#1E3F2F',
+                        forestLight: '#2A5741',
+                        gold: '#C89D54',
+                        goldLight: '#E5C17B',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F4EF;
+            color: #1C1613;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        body.night-mode {
+            background-color: #14110F;
+            color: #F7F4EF;
+        }
+        .night-mode .card-surface {
+            background-color: #221C18;
+            border-color: #382E27;
+            color: #F7F4EF;
+        }
+        .night-mode .text-muted {
+            color: #B5A89B;
+        }
+        .card-surface {
+            background-color: #FFFFFF;
+            border-color: #E6DEC8;
+            transition: all 0.3s ease;
+        }
+        .text-muted {
+            color: #5C5046;
+        }
+        .qr-scan-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #C89D54, #1E3F2F, transparent);
+            box-shadow: 0 0 12px #C89D54;
+            animation: scan 2.5s infinite linear;
+        }
+        @keyframes scan {
+            0% { top: 6%; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { top: 94%; opacity: 0; }
+        }
+        .pulse-badge {
+            animation: pulse-gold 2s infinite;
+        }
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(200, 157, 84, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(200, 157, 84, 0); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold selection:text-espresso">
+
+    <!-- Toast Notification Container (No alert() used) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-forest text-parchment text-xs sm:text-sm py-2.5 px-4 text-center font-medium border-b border-gold/20">
+        <span class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-gold animate-ping"></span>
+            <strong>Nouveau Concept Hybride :</strong> Zéro obligation de consommer pour nos abonnés • 3 boissons offertes / semaine sur votre QR Code !
+        </span>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-parchment/90 dark:bg-espresso/90 border-b border-gold/20 transition-colors duration-500" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-11 h-11 rounded-xl bg-espresso text-gold flex items-center justify-center border border-gold/40 shadow-md group-hover:scale-105 transition-transform">
+                    <i data-lucide="book-open-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <span class="font-serif text-2xl font-bold tracking-tight block leading-none">L'Entracte</span>
+                    <span class="text-[11px] uppercase tracking-widest text-gold font-semibold">Café Littéraire & Stratégie</span>
+                </div>
+            </a>
+
+            <!-- Desktop Links -->
+            <nav class="hidden md:flex items-center gap-7 text-sm font-medium">
+                <a href="#espaces" class="hover:text-gold transition-colors">Les 3 Espaces</a>
+                <a href="#terrasse" class="hover:text-gold transition-colors">Terrasse & Jeux</a>
+                <a href="#abonnements" class="hover:text-gold transition-colors">Abonnements</a>
+                <a href="#simulateur-qr" class="text-gold font-semibold flex items-center gap-1.5">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i> Démo Pass QR
+                </a>
+            </nav>
+
+            <!-- Ambiance Switcher & CTA -->
+            <div class="flex items-center gap-3">
+                <button onclick="toggleAmbiance()" id="ambiance-btn" class="flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold border border-gold/40 bg-cream/70 text-espresso hover:border-gold transition-all shadow-sm" title="Basculer entre l'ambiance Jour (Étude) et Soir (Jeux)">
+                    <i data-lucide="sun" id="ambiance-icon" class="w-4 h-4 text-amber-600"></i>
+                    <span id="ambiance-label" class="hidden sm:inline">Mode Jour (08h-19h)</span>
+                </button>
+
+                <a href="#simulateur-qr" class="bg-forest hover:bg-forestLight text-parchment px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2 border border-gold/30">
+                    <span>Obtenir mon Pass</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION AVEC FOND VIDÉO CINÉMATIQUE -->
+    <section class="relative overflow-hidden py-12 sm:py-20 lg:py-24 border-b border-gold/20 text-white min-h-[85vh] flex items-center">
+        <!-- 1. BALISE VIDÉO D'ARRIÈRE-PLAN -->
+        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none">
+            <!-- ================================================================= -->
+            <!-- ⬇️ COLLEZ L'URL OU LE NOM DE VOTRE VIDÉO ICI ⬇️                    -->
+            <!-- Exemple local : src="ma-video.mp4"                                -->
+            <!-- Exemple en ligne : src="https://mon-site.com/video.mp4"           -->
+            <!-- ================================================================= -->
+            <source src="pub1.mp4" type="video/mp4">
+            <!-- Message de secours si le navigateur ne supporte pas la vidéo -->
+            Votre navigateur ne supporte pas la lecture de vidéo en arrière-plan.
+        </video>
+
+        <!-- 2. FILTRE SOMBRE TRANSLUCIDE (Garantit une lisibilité parfaite des textes et boutons) -->
+        <div class="absolute inset-0 bg-gradient-to-r from-espresso/95 via-espresso/85 to-espresso/70 z-0 backdrop-blur-[2px]"></div>
+
+        <!-- 3. MOTIF SUBTIL DE SÉCURITÉ -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#C89D54_1px,transparent_1px)] [background-size:24px_24px] z-0"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Column: Marketing Pitch -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold/20 border border-gold/40 text-gold text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        Le 1er Tiers-Lieu Étudiant & Stratégique par Abonnement
+                    </div>
+
+                    <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight drop-shadow-md">
+                        Concentrez-vous le jour. <br>
+                        <span class="text-gold italic">Décompressez le soir.</span> <br>
+                        Un seul QR Code.
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-parchment/90 leading-relaxed max-w-2xl drop-shadow-sm">
+                        Fini la pression de devoir racheter un café toutes les heures pour garder votre table. <strong>L'Entracte</strong> réinvente vos longues journées : un sanctuaire d'étude ultra-calme, une bibliothèque avec <strong>poufs géants relaxants</strong> dédiés à la pure lecture, et dès 19h00, une terrasse animée dédiée aux <strong>Échecs, au Rami, au Monopoly et aux jeux de cartes</strong>.
+                    </p>
+
+                    <!-- Interactive Day / Night Preview Switcher Banner -->
+                    <div class="p-4 rounded-2xl bg-espresso/90 border border-gold/30 shadow-xl backdrop-blur-md">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-start gap-3">
+                                <div id="hero-mode-badge" class="w-10 h-10 rounded-xl bg-amber-500/20 text-gold flex items-center justify-center shrink-0 mt-0.5 border border-gold/30">
+                                    <i data-lucide="coffee" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs font-bold uppercase tracking-wider text-gold" id="hero-mode-time">AMBIANCE ACTUELLE : 08H00 – 19H00</div>
+                                    <h2 class="font-bold text-base text-white" id="hero-mode-title">Sanctuaire d'Étude & Poufs Géants de Lecture</h2>
+                                    <p class="text-xs text-parchment/80 mt-0.5" id="hero-mode-desc">Silence respecté, Wi-Fi Fibre, prises à chaque place et accès libre sans obligation de consommer avec votre Pass.</p>
+                                </div>
+                            </div>
+                            <button onclick="toggleAmbiance()" class="shrink-0 px-4 py-2.5 rounded-xl bg-gold text-espresso hover:bg-goldLight text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-md">
+                                <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+                                <span id="hero-switch-btn-text">Voir l'ambiance Soir (19h)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Key Value Props -->
+                    <div class="grid grid-cols-3 gap-4 pt-2">
+                        <div class="p-3.5 rounded-xl bg-espresso/80 border border-gold/30 backdrop-blur-sm">
+                            <div class="text-gold font-serif text-2xl font-bold">0 DH</div>
+                            <div class="text-xs text-parchment/80 font-medium mt-0.5">Obligation d'achat sur place pour les membres</div>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-espresso/80 border border-gold/30 backdrop-blur-sm">
+                            <div class="text-gold font-serif text-2xl font-bold">3 Boissons</div>
+                            <div class="text-xs text-parchment/80 font-medium mt-0.5">Gratuites chaque semaine sur votre QR Code</div>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-espresso/80 border border-gold/30 backdrop-blur-sm">
+                            <div class="text-gold font-serif text-2xl font-bold">19h – 00h</div>
+                            <div class="text-xs text-parchment/80 font-medium mt-0.5">Terrasse Échecs, Rami, Monopoly & Cartes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Visual Interactive Showcase Card -->
+                <div class="lg:col-span-5">
+                    <div class="relative rounded-3xl overflow-hidden border-2 border-gold/40 shadow-2xl bg-espresso text-parchment p-6 sm:p-8">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+                            <div>
+                                <span class="text-xs uppercase tracking-widest text-gold font-semibold">Expérience Membre</span>
+                                <h3 class="font-serif text-2xl font-bold">Un Lieu, Trois Univers</h3>
+                            </div>
+                            <span class="px-3 py-1 rounded-full bg-forest text-gold text-xs font-semibold border border-gold/30">Ouvert 7j/7</span>
+                        </div>
+
+                        <!-- Interactive Mini-Timeline -->
+                        <div class="space-y-4">
+                            <!-- Morning/Afternoon Study -->
+                            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-gold/50 transition-all">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-gold flex items-center gap-1.5">
+                                        <i data-lucide="laptop" class="w-4 h-4"></i> 08h00 - 19h00 • Concentration
+                                    </span>
+                                    <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded text-parchment/80">Zone Silence</span>
+                                </div>
+                                <h4 class="font-semibold text-base">Étude Longue Durée & Bibliothèque</h4>
+                                <p class="text-xs text-parchment/70 mt-1">Bureaux individuels électrifiés pour travailler vos cours, ou <strong>poufs géants sur-mesure</strong> pour lire un roman sans aucun écran.</p>
+                            </div>
+
+                            <!-- Coffee Counter QR -->
+                            <div class="p-4 rounded-2xl bg-gold/10 border border-gold/40 transition-all">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-goldLight flex items-center gap-1.5">
+                                        <i data-lucide="qr-code" class="w-4 h-4"></i> Pause Café • Pass QR Code
+                                    </span>
+                                    <span class="text-[11px] bg-gold text-espresso font-bold px-2 py-0.5 rounded">3 Offertes / Semaine</span>
+                                </div>
+                                <h4 class="font-semibold text-base">Scannez au Comptoir, C'est Offert</h4>
+                                <p class="text-xs text-parchment/80 mt-1">Votre abonnement inclut 3 boissons classiques par semaine. Vous voulez juste lire ou étudier sans rien commander ? Vous êtes chez vous.</p>
+                            </div>
+
+                            <!-- Evening Terrace Games -->
+                            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-gold/50 transition-all">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                                        <i data-lucide="crown" class="w-4 h-4"></i> 19h00 - Minuit • La Terrasse
+                                    </span>
+                                    <span class="text-[11px] bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded">Club du Soir</span>
+                                </div>
+                                <h4 class="font-semibold text-base">Échecs, Rami, Monopoly & Cartes</h4>
+                                <p class="text-xs text-parchment/70 mt-1">Après une journée de révision, place à la stratégie en terrasse ! Accès gratuit pour les membres (supplément à l'entrée pour les visiteurs).</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 pt-5 border-t border-white/10 flex items-center justify-between">
+                            <div class="text-xs text-parchment/70">
+                                Prêt pour la démonstration en classe ?
+                            </div>
+                            <a href="#simulateur-qr" class="text-xs font-bold text-gold hover:text-goldLight flex items-center gap-1">
+                                Tester le Générateur QR <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: LES 3 ESPACES DU CAFÉ LITTÉRAIRE -->
+    <section id="espaces" class="py-16 sm:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs uppercase tracking-widest text-gold font-bold">Architecture & Ergonomie</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold mt-2">Trois Zones Conçues pour Votre Esprit</h2>
+                <p class="text-muted text-sm sm:text-base mt-3">
+                    Parce qu'on n'a pas besoin du même fauteuil pour rédiger une thèse, dévorer un roman ou bluffer au Rami, L'Entracte sépare strictement ses espaces.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Space 1: Study Sanctuary -->
+                <div class="rounded-3xl card-surface border p-7 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all relative overflow-hidden group">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-forest/10 text-forest dark:bg-forest dark:text-gold flex items-center justify-center">
+                                <i data-lucide="lamp-desk" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                                Étude Longue Durée
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold mb-3">1. Le Sanctuaire d'Étude</h3>
+                        <p class="text-sm text-muted leading-relaxed mb-6">
+                            Conçu pour les marathons de révisions (6h+ d'affilée). Fauteuils ergonomiques réglables, lumière chaude anti-fatigue et silence studieux garanti.
+                        </p>
+                        <ul class="space-y-2.5 text-xs sm:text-sm mb-6">
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-forest dark:text-gold shrink-0"></i>
+                                <span>Prise électrique & port USB-C à chaque table</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-forest dark:text-gold shrink-0"></i>
+                                <span>Wi-Fi Fibre Optique dédié aux étudiants</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-forest dark:text-gold shrink-0"></i>
+                                <span><strong>Zéro pression d'achat</strong> avec le Pass Lecteur</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pt-4 border-t border-gold/20 flex items-center justify-between text-xs font-semibold text-gold">
+                        <span>Capacité : 45 bureaux individuels</span>
+                        <span>08h00 – 22h00</span>
+                    </div>
+                </div>
+
+                <!-- Space 2: Bean Bag Pure Reading Zone -->
+                <div class="rounded-3xl card-surface border-2 border-gold p-7 flex flex-col justify-between shadow-md hover:shadow-xl transition-all relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-gold text-espresso text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl">
+                        Exclusivité L'Entracte
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-gold/20 text-espresso dark:text-gold flex items-center justify-center">
+                                <i data-lucide="armchair" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-gold/15 text-gold border border-gold/30">
+                                Zéro Écriture • 100% Lecture
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold mb-3">2. Le Salon des Poufs Géants</h3>
+                        <p class="text-sm text-muted leading-relaxed mb-6">
+                            Vous voulez juste lire un livre sans écrire ni taper au clavier ? Plongez dans nos <strong>poufs géants sur-mesure (bean bags)</strong> ultra-moelleux au cœur de la bibliothèque.
+                        </p>
+                        <ul class="space-y-2.5 text-xs sm:text-sm mb-6">
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-gold shrink-0"></i>
+                                <span>Poufs ergonomiques géants & repose-pieds</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-gold shrink-0"></i>
+                                <span>Plus de 1 200 livres (romans, philo, mangas, BD)</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-gold shrink-0"></i>
+                                <span>Zone sans ordinateurs (zéro bruit de clavier)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pt-4 border-t border-gold/20 flex items-center justify-between text-xs font-semibold text-gold">
+                        <span>Capacité : 25 Poufs Géants</span>
+                        <span>Accès Libre Membres</span>
+                    </div>
+                </div>
+
+                <!-- Space 3: Strategic Evening Terrace -->
+                <div class="rounded-3xl card-surface border p-7 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all relative overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-espresso text-gold flex items-center justify-center">
+                                <i data-lucide="dices" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                                Ouverture dès 19h00
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold mb-3">3. La Terrasse Stratégique</h3>
+                        <p class="text-sm text-muted leading-relaxed mb-6">
+                            Après une longue journée d'étude, la terrasse s'illumine ! Retrouvez vos amis autour d'une partie d'Échecs, de Rami, de Monopoly ou de jeux de cartes.
+                        </p>
+                        <ul class="space-y-2.5 text-xs sm:text-sm mb-6">
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-forest dark:text-gold shrink-0"></i>
+                                <span>Échiquiers en bois & pendules officielles</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-forest dark:text-gold shrink-0"></i>
+                                <span>Malles de Rami, Monopoly & Jeux de Cartes</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-forest dark:text-gold shrink-0"></i>
+                                <span><strong>Gratuit avec Pass</strong> (25 DH l'entrée visiteur)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pt-4 border-t border-gold/20 flex items-center justify-between text-xs font-semibold text-gold">
+                        <span>Soirées & Tournois</span>
+                        <span>19h00 – 00h00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: LA TERRASSE DE JEUX DU SOIR (FILTERABLE CATALOGUE) -->
+    <section id="terrasse" class="py-16 bg-espresso text-parchment border-y border-gold/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-gold text-xs font-bold uppercase tracking-widest mb-2">
+                        <i data-lucide="moon" class="w-4 h-4"></i> Dès 19h00 sur la Terrasse
+                    </div>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold">Le Club du Soir : Décompressez par le Jeu</h2>
+                    <p class="text-parchment/70 text-sm sm:text-base mt-2 max-w-2xl">
+                        L'accès à la terrasse de jeux le soir comporte des frais d'entrée (25 DH) pour le public externe, mais il est <strong>100 % gratuit et illimité</strong> pour les détenteurs du <em>Pass Joueur</em> ou <em>Pass Grand Maître</em>.
+                    </p>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterGames('all')" class="game-filter-btn active-filter px-4 py-2 rounded-xl text-xs font-bold bg-gold text-espresso transition-all" data-filter="all">Tous les Jeux</button>
+                    <button onclick="filterGames('strategie')" class="game-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/10 text-parchment hover:bg-white/20 transition-all" data-filter="strategie">Échecs & Stratégie</button>
+                    <button onclick="filterGames('ambiance')" class="game-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/10 text-parchment hover:bg-white/20 transition-all" data-filter="ambiance">Rami, Monopoly & Cartes</button>
+                </div>
+            </div>
+
+            <!-- Games Grid -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" id="games-grid">
+                <!-- Game 1: Chess -->
+                <div class="game-card rounded-2xl bg-roast border border-white/10 p-5 flex flex-col justify-between hover:border-gold transition-all" data-category="strategie">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-3xl">♟️</span>
+                            <span class="text-[11px] font-bold uppercase px-2.5 py-1 rounded bg-gold/20 text-gold">Tournoi Vendredi</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-1">Échecs sur Terrasse</h3>
+                        <p class="text-xs text-parchment/70 leading-relaxed mb-4">
+                            12 tables d'échecs officielles Staunton avec pendules digitales. Parties blitz, rapides ou amicales après vos révisions.
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                        <span class="text-emerald-400 font-medium">● 8 tables libres ce soir</span>
+                        <button onclick="reserveTable('Table d\'Échecs')" class="text-gold hover:underline font-semibold">Réserver →</button>
+                    </div>
+                </div>
+
+                <!-- Game 2: Rummy (Rami) -->
+                <div class="game-card rounded-2xl bg-roast border border-white/10 p-5 flex flex-col justify-between hover:border-gold transition-all" data-category="ambiance">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-3xl">🀄</span>
+                            <span class="text-[11px] font-bold uppercase px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300">Très Populaire</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-1">Tables de Rami</h3>
+                        <p class="text-xs text-parchment/70 leading-relaxed mb-4">
+                            Chevalets en bois massif et tuiles professionnelles. Parfait pour des parties à 4 joueurs autour d'un thé à la menthe ou d'un espresso.
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                        <span class="text-emerald-400 font-medium">● 5 tables libres ce soir</span>
+                        <button onclick="reserveTable('Table de Rami (4 joueurs)')" class="text-gold hover:underline font-semibold">Réserver →</button>
+                    </div>
+                </div>
+
+                <!-- Game 3: Monopoly -->
+                <div class="game-card rounded-2xl bg-roast border border-white/10 p-5 flex flex-col justify-between hover:border-gold transition-all" data-category="ambiance">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-3xl">🎩</span>
+                            <span class="text-[11px] font-bold uppercase px-2.5 py-1 rounded bg-white/10 text-parchment/80">2 à 6 Joueurs</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-1">Monopoly Classique & Éditions</h3>
+                        <p class="text-xs text-parchment/70 leading-relaxed mb-4">
+                            Négociez, achetez et gérez vos hôtels ! Plusieurs éditions disponibles pour des soirées pleines de rebondissements entre étudiants.
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                        <span class="text-amber-400 font-medium">● 3 boîtes disponibles</span>
+                        <button onclick="reserveTable('Table Monopoly')" class="text-gold hover:underline font-semibold">Réserver →</button>
+                    </div>
+                </div>
+
+                <!-- Game 4: Card Games -->
+                <div class="game-card rounded-2xl bg-roast border border-white/10 p-5 flex flex-col justify-between hover:border-gold transition-all" data-category="strategie">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-3xl">🃏</span>
+                            <span class="text-[11px] font-bold uppercase px-2.5 py-1 rounded bg-white/10 text-parchment/80">Ambiance & Bluff</span>
+                        </div>
+                        <h3 class="font-serif text-xl font-bold mb-1">Jeux de Cartes & Société</h3>
+                        <p class="text-xs text-parchment/70 leading-relaxed mb-4">
+                            Uno, Ronda, Belote, Poker sans argent (jetons de tournoi), Catan et Loup-Garou pour décompresser après les examens.
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-white/10 flex items-center justify-between text-xs">
+                        <span class="text-emerald-400 font-medium">● Accès libre bar à jeux</span>
+                        <button onclick="reserveTable('Table Jeux de Cartes')" class="text-gold hover:underline font-semibold">Réserver →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: LES 3 FORMULES D'ABONNEMENT (PRICING) -->
+    <section id="abonnements" class="py-16 sm:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs uppercase tracking-widest text-gold font-bold">Modèle d'Abonnement Innovant</span>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold mt-2">Choisissez Votre Pass QR Code</h2>
+                <p class="text-muted text-sm sm:text-base mt-3">
+                    Inscrivez-vous en ligne et recevez immédiatement votre <strong>QR Code personnel</strong>. Il vous permet d'entrer librement sans obligation d'achat, de débiter vos <strong>3 boissons gratuites par semaine</strong> et d'accéder à la terrasse de jeux.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 items-stretch">
+                
+                <!-- TIER 1: PASS LE LECTEUR -->
+                <div class="rounded-3xl card-surface border p-8 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300">Formule 1 • Étude & Lecture</span>
+                            <i data-lucide="book-open" class="w-6 h-6 text-gold"></i>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold">Pass « Le Lecteur »</h3>
+                        <p class="text-xs text-muted mt-1">Idéal pour ceux qui étudient de longues heures ou veulent lire dans nos poufs géants sans pression.</p>
+                        
+                        <div class="my-6 pb-6 border-b border-gold/20">
+                            <div class="flex items-baseline gap-1">
+                                <span class="font-serif text-4xl font-bold">149 DH</span>
+                                <span class="text-xs text-muted font-medium">/ mois</span>
+                            </div>
+                            <p class="text-xs text-forest dark:text-gold font-semibold mt-1">Rentabilisé dès la 2ème semaine grâce aux 12 boissons offertes/mois !</p>
+                        </div>
+
+                        <ul class="space-y-3.5 text-sm mb-8">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="coffee" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span><strong>3 boissons classiques gratuites / semaine</strong> (Espresso, Américain, Thé, Chocolat) créditées sur votre QR Code.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="shield-check" class="w-5 h-5 text-forest dark:text-emerald-400 shrink-0 mt-0.5"></i>
+                                <span><strong>Droit d'accès sans consommer :</strong> Étudiez ou lisez toute la journée même sans rien acheter.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="armchair" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span>Accès illimité à la bibliothèque et aux <strong>poufs géants de lecture</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-muted opacity-60">
+                                <i data-lucide="x-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                                <span>Soirées Jeux en Terrasse non incluses (supplément visiteur le soir).</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button onclick="selectTierAndGenerate('Pass Le Lecteur')" class="w-full py-3.5 px-6 rounded-xl border-2 border-espresso dark:border-gold font-bold text-sm hover:bg-espresso hover:text-parchment dark:hover:bg-gold dark:hover:text-espresso transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        <span>Choisir le Pass Lecteur</span>
+                    </button>
+                </div>
+
+                <!-- TIER 3 (CENTER HIGHLIGHT): PASS LE GRAND MAÎTRE (COMBINAISON) -->
+                <div class="rounded-3xl bg-espresso text-parchment border-2 border-gold p-8 flex flex-col justify-between shadow-2xl relative transform lg:-translate-y-4">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gold text-espresso text-xs font-extrabold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-md pulse-badge whitespace-nowrap">
+                        ★ Formule 3 • Le Plus Populaire (Tout Inclus)
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-gold/20 text-gold border border-gold/30">Étude + Boissons + Jeux</span>
+                            <i data-lucide="crown" class="w-6 h-6 text-gold"></i>
+                        </div>
+                        <h3 class="font-serif text-3xl font-bold text-gold">Pass « Le Grand Maître »</h3>
+                        <p class="text-xs text-parchment/80 mt-1">La combinaison ultime : étudiez toute la journée, buvez vos cafés gratuits et jouez sur la terrasse le soir !</p>
+                        
+                        <div class="my-6 pb-6 border-b border-white/15">
+                            <div class="flex items-baseline gap-2">
+                                <span class="font-serif text-5xl font-bold text-white">219 DH</span>
+                                <span class="text-xs text-parchment/70 font-medium">/ mois</span>
+                                <span class="text-xs line-through text-parchment/40 ml-1">268 DH</span>
+                            </div>
+                            <p class="text-xs text-goldLight font-semibold mt-1">Économisez 49 DH/mois • Un seul QR Code pour le jour et la nuit</p>
+                        </div>
+
+                        <ul class="space-y-3.5 text-sm mb-8">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span><strong>3 boissons gratuites / semaine</strong> payables directement par scan de votre QR Code au comptoir.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span><strong>Accès 100% libre sans obligation d'achat</strong> au Sanctuaire d'Étude, aux Poufs Géants et aux livres.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span><strong>Accès Gratuit & Illimité à la Terrasse Jeux</strong> tous les soirs (Échecs, Rami, Monopoly, Cartes — aucun frais d'entrée).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="check-circle-2" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span>Inscription gratuite aux tournois hebdomadaires + 1 invité gratuit par mois.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button onclick="selectTierAndGenerate('Pass Le Grand Maître')" class="w-full py-4 px-6 rounded-xl bg-gold hover:bg-goldLight text-espresso font-extrabold text-sm shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Activer le Pass Grand Maître</span>
+                    </button>
+                </div>
+
+                <!-- TIER 2: PASS LE JOUEUR -->
+                <div class="rounded-3xl card-surface border p-8 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">Formule 2 • Terrasse & Jeux</span>
+                            <i data-lucide="dices" class="w-6 h-6 text-forest dark:text-gold"></i>
+                        </div>
+                        <h3 class="font-serif text-2xl font-bold">Pass « Le Joueur »</h3>
+                        <p class="text-xs text-muted mt-1">Conçu pour les passionnés d'Échecs, de Rami, de Monopoly et de cartes qui viennent décompresser dès 19h00.</p>
+                        
+                        <div class="my-6 pb-6 border-b border-gold/20">
+                            <div class="flex items-baseline gap-1">
+                                <span class="font-serif text-4xl font-bold">119 DH</span>
+                                <span class="text-xs text-muted font-medium">/ mois</span>
+                            </div>
+                            <p class="text-xs text-forest dark:text-gold font-semibold mt-1">Évitez les 25 DH de frais d'entrée par soirée sur la terrasse !</p>
+                        </div>
+
+                        <ul class="space-y-3.5 text-sm mb-8">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="trophy" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span><strong>Entrée 100% gratuite tous les soirs</strong> sur la Terrasse Stratégique (19h00 - Minuit).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="Layers" class="w-5 h-5 text-forest dark:text-emerald-400 shrink-0 mt-0.5"></i>
+                                <span>Accès illimité aux malles de jeux : <strong>Échecs, Rami, Monopoly, Uno, Cartes</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="calendar-check" class="w-5 h-5 text-gold shrink-0 mt-0.5"></i>
+                                <span>Réservation prioritaire des tables le week-end et accès aux tournois officiels.</span>
+                            </li>
+                            <li class="flex items-start gap-3 text-muted opacity-60">
+                                <i data-lucide="x-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                                <span>N'inclut pas les 3 boissons gratuites hebdomadaires ni le forfait étude journée.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button onclick="selectTierAndGenerate('Pass Le Joueur')" class="w-full py-3.5 px-6 rounded-xl border-2 border-espresso dark:border-gold font-bold text-sm hover:bg-espresso hover:text-parchment dark:hover:bg-gold dark:hover:text-espresso transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        <span>Choisir le Pass Joueur</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 5: SIMULATEUR INTERACTIF DE PASS QR CODE (POUR LA PRÉSENTATION EN CLASSE) -->
+    <section id="simulateur-qr" class="py-16 sm:py-24 bg-cream/60 dark:bg-roast/50 border-t border-gold/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Column: Form & Controls for Live Class Presentation -->
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forest text-gold text-xs font-bold uppercase tracking-wider">
+                        <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Démonstration Interactive en Direct
+                    </div>
+                    <h2 class="font-serif text-3xl sm:text-4xl font-bold">Générez & Testez Votre Pass QR Code</h2>
+                    <p class="text-sm sm:text-base text-muted leading-relaxed">
+                        Testez notre système digital en direct : créez votre carte de membre, puis cliquez sur les boutons de simulation pour voir comment le QR Code débite vos <strong>3 boissons gratuites de la semaine</strong> ou déverrouille le portique de la bibliothèque et de la terrasse de jeux.
+                    </p>
+
+                    <!-- Member Customization Form -->
+                    <div class="p-6 rounded-2xl card-surface border shadow-sm space-y-4">
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Nom & Prénom du Membre</label>
+                                <input type="text" id="member-name-input" value="Yassine El Amrani" oninput="updateQRPass()" placeholder="Ex: Sara Benali" class="w-full px-4 py-2.5 rounded-xl border border-gold/40 bg-transparent text-sm font-medium focus:outline-none focus:border-gold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider mb-1.5">Formule Choisie</label>
+                                <select id="member-tier-select" onchange="updateQRPass()" class="w-full px-4 py-2.5 rounded-xl border border-gold/40 bg-parchment dark:bg-espresso text-sm font-semibold focus:outline-none focus:border-gold">
+                                    <option value="Pass Le Grand Maître" selected>Pass « Le Grand Maître » (219 DH)</option>
+                                    <option value="Pass Le Lecteur">Pass « Le Lecteur » (149 DH)</option>
+                                    <option value="Pass Le Joueur">Pass « Le Joueur » (119 DH)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Live Demo Action Buttons for Teacher/Class Presentation -->
+                        <div class="pt-3 border-t border-gold/20">
+                            <span class="block text-xs font-bold uppercase tracking-wider text-gold mb-3">
+                                Actions de Simulation (Cliquez pour tester le QR Code) :
+                            </span>
+                            <div class="grid sm:grid-cols-2 gap-3">
+                                <button onclick="simulateDrinkScan()" id="btn-scan-drink" class="py-3 px-4 rounded-xl bg-forest hover:bg-forestLight text-parchment text-xs font-bold shadow flex items-center justify-center gap-2 transition-all">
+                                    <i data-lucide="coffee" class="w-4 h-4 text-gold"></i>
+                                    <span>Scanner 1 Boisson Gratuite</span>
+                                </button>
+                                <button onclick="simulateGateAccess()" class="py-3 px-4 rounded-xl bg-espresso hover:bg-roast text-gold border border-gold/40 text-xs font-bold shadow flex items-center justify-center gap-2 transition-all">
+                                    <i data-lucide="door-open" class="w-4 h-4"></i>
+                                    <span>Scanner Entrée (Sans Achat / Jeux)</span>
+                                </button>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between">
+                                <button onclick="resetWeeklyDrinks()" class="text-xs text-muted hover:text-gold underline flex items-center gap-1">
+                                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Réinitialiser la semaine (3/3 boissons)
+                                </button>
+                                <span id="last-scan-status" class="text-xs font-semibold text-forest dark:text-gold">Prêt à scanner</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Realistic Digital Apple/Google Wallet Style QR Pass -->
+                <div class="lg:col-span-6 flex justify-center">
+                    <div id="digital-pass-card" class="w-full max-w-md rounded-3xl bg-espresso text-parchment border-2 border-gold shadow-2xl overflow-hidden transition-all duration-300">
+                        
+                        <!-- Card Header -->
+                        <div class="bg-gradient-to-r from-forest to-espresso p-6 border-b border-gold/30 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gold text-espresso flex items-center justify-center font-bold">
+                                    <i data-lucide="book-open-check" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="font-serif font-bold text-lg leading-none">L'Entracte</div>
+                                    <div class="text-[10px] uppercase tracking-widest text-gold font-semibold mt-0.5">Pass Membre Officiel</div>
+                                </div>
+                            </div>
+                            <span id="card-tier-badge" class="px-3 py-1 rounded-full bg-gold text-espresso text-xs font-extrabold uppercase tracking-wider">
+                                Grand Maître
+                            </span>
+                        </div>
+
+                        <!-- Card Body: QR Code & Live Counters -->
+                        <div class="p-6 space-y-6">
+                            
+                            <!-- Member Info Row -->
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <div class="text-[10px] uppercase tracking-widest text-parchment/60">Titulaire du Pass</div>
+                                    <div id="card-member-name" class="font-serif text-xl font-bold text-white">Yassine El Amrani</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-[10px] uppercase tracking-widest text-parchment/60">ID Membre</div>
+                                    <div id="card-member-id" class="font-mono text-xs text-gold font-bold">#ENT-2026-849</div>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic QR Code Container with Laser Scan Animation -->
+                            <div class="relative mx-auto w-48 h-48 bg-white p-3.5 rounded-2xl shadow-inner flex items-center justify-center overflow-hidden border-4 border-gold/60">
+                                <div class="qr-scan-line"></div>
+                                <!-- Dynamic SVG QR Code -->
+                                <svg id="dynamic-qr-svg" viewBox="0 0 100 100" class="w-full h-full text-espresso" fill="currentColor">
+                                    <!-- Finder Patterns -->
+                                    <path d="M5,5 h28 v28 h-28 z M10,10 v18 h18 v-18 z M14,14 h10 v10 h-10 z"/>
+                                    <path d="M67,5 h28 v28 h-28 z M72,10 v18 h18 v-18 z M76,14 h10 v10 h-10 z"/>
+                                    <path d="M5,67 h28 v28 h-28 z M10,72 v18 h18 v-18 z M14,76 h10 v10 h-10 z"/>
+                                    <!-- Dynamic Data Modules -->
+                                    <g id="qr-data-modules">
+                                        <rect x="38" y="8" width="5" height="5"/><rect x="48" y="8" width="5" height="10"/><rect x="58" y="12" width="5" height="5"/>
+                                        <rect x="38" y="20" width="10" height="5"/><rect x="53" y="22" width="10" height="5"/>
+                                        <rect x="8" y="38" width="10" height="5"/><rect x="24" y="38" width="5" height="10"/><rect x="36" y="36" width="8" height="8"/>
+                                        <rect x="46" y="46" width="8" height="8" fill="#1E3F2F"/>
+                                        <rect x="58" y="38" width="5" height="12"/><rect x="70" y="38" width="12" height="5"/><rect x="88" y="38" width="5" height="10"/>
+                                        <rect x="12" y="50" width="8" height="5"/><rect x="34" y="52" width="6" height="12"/><rect x="64" y="54" width="10" height="6"/>
+                                        <rect x="82" y="52" width="10" height="10"/><rect x="38" y="70" width="12" height="5"/><rect x="56" y="68" width="6" height="14"/>
+                                        <rect x="68" y="72" width="14" height="6"/><rect x="86" y="70" width="6" height="12"/>
+                                        <rect x="40" y="82" width="8" height="10"/><rect x="68" y="84" width="10" height="8"/><rect x="84" y="86" width="8" height="6"/>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- Live Drink Quota Tracker (3 Free Basic Drinks / Week) -->
+                            <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold text-gold flex items-center gap-1.5">
+                                        <i data-lucide="coffee" class="w-4 h-4"></i> Boissons Classiques Offertes (Semaine)
+                                    </span>
+                                    <span id="drinks-counter-text" class="text-xs font-extrabold bg-gold text-espresso px-2.5 py-0.5 rounded-full">
+                                        3 / 3 restantes
+                                    </span>
+                                </div>
+                                <!-- Visual Cups Bar -->
+                                <div class="grid grid-cols-3 gap-2 mt-2" id="drink-cups-indicators">
+                                    <div class="h-2.5 rounded-full bg-gold transition-all"></div>
+                                    <div class="h-2.5 rounded-full bg-gold transition-all"></div>
+                                    <div class="h-2.5 rounded-full bg-gold transition-all"></div>
+                                </div>
+                                <p id="drinks-subtext" class="text-[11px] text-parchment/70 mt-2">
+                                    Présentez ce QR Code au barista pour obtenir votre Espresso, Café Américain ou Thé gratuitement.
+                                </p>
+                            </div>
+
+                            <!-- Access Rights Summary -->
+                            <div class="grid grid-cols-2 gap-3 text-xs">
+                                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div class="text-parchment/60 text-[10px] uppercase">Étude & Poufs Lecture</div>
+                                    <div id="access-study-status" class="font-bold text-emerald-400 mt-0.5 flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Sans obligation d'achat
+                                    </div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                                    <div class="text-parchment/60 text-[10px] uppercase">Terrasse Jeux (19h)</div>
+                                    <div id="access-games-status" class="font-bold text-emerald-400 mt-0.5 flex items-center gap-1">
+                                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Entrée Gratuite Inclus
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-espresso text-parchment border-t border-gold/30 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 pb-8 border-b border-white/10">
+                <div class="md:col-span-2 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-gold text-espresso flex items-center justify-center font-bold">
+                            <i data-lucide="book-open-check" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-serif text-2xl font-bold">L'Entracte</span>
+                    </div>
+                    <p class="text-xs text-parchment/70 max-w-md leading-relaxed">
+                        Le premier café littéraire, sanctuaire d'étude longue durée et club de jeux de société en terrasse fonctionnant par abonnement QR Code. Étudiez, lisez dans nos poufs géants sans obligation de consommer, et jouez le soir.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-gold mb-3">Horaires d'Ouverture</h4>
+                    <ul class="space-y-2 text-xs text-parchment/80">
+                        <li><strong>Sanctuaire d'Étude :</strong> 08h00 – 22h00</li>
+                        <li><strong>Salon Poufs & Lecture :</strong> 08h00 – 22h00</li>
+                        <li><strong>Terrasse Jeux (Échecs, Rami...) :</strong> 19h00 – 00h00</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-gold mb-3">Charte du Club</h4>
+                    <ul class="space-y-2 text-xs text-parchment/80">
+                        <li>• Silence strict dans l'espace étude</li>
+                        <li>• Poufs géants réservés à la lecture (sans PC)</li>
+                        <li>• 3 boissons offertes / sem. sur présentation du QR</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-parchment/50 gap-4">
+                <div>© 2026 L'Entracte — Projet Marketing & Création d'Entreprise. Tous droits réservés.</div>
+                <div class="flex gap-4">
+                    <a href="#espaces" class="hover:text-gold">Les Espaces</a>
+                    <a href="#abonnements" class="hover:text-gold">Tarifs</a>
+                    <a href="#simulateur-qr" class="hover:text-gold">Simulateur QR</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // State for the interactive QR Pass simulator
+        let isNightMode = false;
+        let remainingDrinks = 3;
+        let currentTier = 'Pass Le Grand Maître';
+
+        // Toast Notification Helper (Replaces alert())
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const borderColor = type === 'warning' ? 'border-amber-500' : 'border-gold';
+            const badgeBg = type === 'warning' ? 'bg-amber-500 text-espresso' : 'bg-gold text-espresso';
+
+            toast.className = `pointer-events-auto p-4 rounded-2xl bg-espresso text-parchment border-2 ${borderColor} shadow-2xl transform transition-all duration-300 translate-y-2 opacity-0 flex items-start gap-3`;
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-xl ${badgeBg} flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">
+                    QR
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-xs text-gold uppercase tracking-wider">${title}</h4>
+                    <p class="text-xs text-parchment/90 mt-1 leading-relaxed">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4200);
+        }
+
+        // Toggle Day (Study/Reading) vs Night (Terrace Games) Ambiance
+        function toggleAmbiance() {
+            isNightMode = !isNightMode;
+            document.body.classList.toggle('night-mode', isNightMode);
+
+            const label = document.getElementById('ambiance-label');
+            const heroTime = document.getElementById('hero-mode-time');
+            const heroTitle = document.getElementById('hero-mode-title');
+            const heroDesc = document.getElementById('hero-mode-desc');
+            const heroSwitchText = document.getElementById('hero-switch-btn-text');
+
+            if (isNightMode) {
+                label.textContent = 'Mode Soir : Terrasse Jeux (19h-00h)';
+                heroTime.textContent = 'AMBIANCE SOIRÉE : 19H00 – MINUIT';
+                heroTitle.textContent = 'La Terrasse Stratégique : Échecs, Rami, Monopoly & Cartes';
+                heroDesc.textContent = 'Après une longue journée de révisions, la terrasse s\'anime ! Accès gratuit avec le Pass Joueur ou Grand Maître.';
+                heroSwitchText.textContent = 'Revenir au Mode Jour (08h)';
+                showToast('Ambiance Soir Activée (19h00)', 'Bienvenue sur la Terrasse Stratégique : les tables d\'Échecs, de Rami et de Monopoly sont ouvertes !');
+            } else {
+                label.textContent = 'Mode Jour (08h-19h)';
+                heroTime.textContent = 'AMBIANCE ACTUELLE : 08H00 – 19H00';
+                heroTitle.textContent = 'Sanctuaire d\'Étude & Poufs Géants de Lecture';
+                heroDesc.textContent = 'Silence respecté, Wi-Fi Fibre, prises à chaque place et accès libre sans obligation de consommer avec votre Pass.';
+                heroSwitchText.textContent = 'Voir l\'ambiance Soir (19h)';
+                showToast('Ambiance Jour Activée (08h00)', 'Retour au calme : le Sanctuaire d\'Étude et les Poufs Géants de lecture vous accueillent.');
+            }
+        }
+
+        // Filter Evening Terrace Games
+        function filterGames(category) {
+            const cards = document.querySelectorAll('.game-card');
+            const buttons = document.querySelectorAll('.game-filter-btn');
+
+            buttons.forEach(btn => {
+                if (btn.dataset.filter === category) {
+                    btn.className = 'game-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-gold text-espresso transition-all';
+                } else {
+                    btn.className = 'game-filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/10 text-parchment hover:bg-white/20 transition-all';
+                }
+            });
+
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Reserve a Game Table Demo
+        function reserveTable(tableName) {
+            showToast(
+                'Table Pré-Réservée sur la Terrasse',
+                `Votre ${tableName} est réservée pour ce soir à 19h30. Présentez simplement votre Pass QR Code à l'entrée de la terrasse !`
+            );
+        }
+
+        // Select Tier from Pricing Cards and Scroll to QR Simulator
+        function selectTierAndGenerate(tierName) {
+            const select = document.getElementById('member-tier-select');
+            select.value = tierName;
+            updateQRPass();
+            document.getElementById('simulateur-qr').scrollIntoView({ behavior: 'smooth' });
+            showToast('Formule Sélectionnée', `Votre simulateur a été configuré sur le « ${tierName} ». Testez votre QR Code ci-dessous !`);
+        }
+
+        // Update Digital QR Pass Card dynamically
+        function updateQRPass() {
+            const nameInput = document.getElementById('member-name-input').value.trim() || 'Membre L\'Entracte';
+            const tierSelect = document.getElementById('member-tier-select').value;
+            currentTier = tierSelect;
+
+            document.getElementById('card-member-name').textContent = nameInput;
+
+            // Generate deterministic Member ID & QR visual variation
+            const hash = nameInput.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            document.getElementById('card-member-id').textContent = `#ENT-2026-${(hash % 900) + 100}`;
+
+            const badge = document.getElementById('card-tier-badge');
+            const studyStatus = document.getElementById('access-study-status');
+            const gamesStatus = document.getElementById('access-games-status');
+
+            if (tierSelect === 'Pass Le Grand Maître') {
+                badge.textContent = 'Grand Maître';
+                badge.className = 'px-3 py-1 rounded-full bg-gold text-espresso text-xs font-extrabold uppercase tracking-wider';
+                remainingDrinks = 3;
+                studyStatus.innerHTML = '✓ Sans obligation d\'achat';
+                studyStatus.className = 'font-bold text-emerald-400 mt-0.5 flex items-center gap-1';
+                gamesStatus.innerHTML = '✓ Entrée Gratuite Inclus';
+                gamesStatus.className = 'font-bold text-emerald-400 mt-0.5 flex items-center gap-1';
+            } else if (tierSelect === 'Pass Le Lecteur') {
+                badge.textContent = 'Pass Lecteur';
+                badge.className = 'px-3 py-1 rounded-full bg-amber-400 text-espresso text-xs font-extrabold uppercase tracking-wider';
+                remainingDrinks = 3;
+                studyStatus.innerHTML = '✓ Sans obligation d\'achat';
+                studyStatus.className = 'font-bold text-emerald-400 mt-0.5 flex items-center gap-1';
+                gamesStatus.innerHTML = '✕ Supplément soir (25 DH)';
+                gamesStatus.className = 'font-bold text-amber-400 mt-0.5 flex items-center gap-1';
+            } else {
+                badge.textContent = 'Pass Joueur';
+                badge.className = 'px-3 py-1 rounded-full bg-emerald-400 text-espresso text-xs font-extrabold uppercase tracking-wider';
+                remainingDrinks = 0;
+                studyStatus.innerHTML = '✕ Tarif standard journée';
+                studyStatus.className = 'font-bold text-amber-400 mt-0.5 flex items-center gap-1';
+                gamesStatus.innerHTML = '✓ Entrée Gratuite Inclus';
+                gamesStatus.className = 'font-bold text-emerald-400 mt-0.5 flex items-center gap-1';
+            }
+
+            renderDrinkIndicators();
+        }
+
+        // Render the 3 visual drink bars on the QR Pass
+        function renderDrinkIndicators() {
+            const counterText = document.getElementById('drinks-counter-text');
+            const cupsContainer = document.getElementById('drink-cups-indicators');
+            const subtext = document.getElementById('drinks-subtext');
+
+            if (currentTier === 'Pass Le Joueur') {
+                counterText.textContent = 'Non inclus (Pass Joueur)';
+                counterText.className = 'text-xs font-bold bg-white/10 text-parchment/70 px-2.5 py-0.5 rounded-full';
+                cupsContainer.innerHTML = `
+                    <div class="h-2.5 rounded-full bg-white/10"></div>
+                    <div class="h-2.5 rounded-full bg-white/10"></div>
+                    <div class="h-2.5 rounded-full bg-white/10"></div>
+                `;
+                subtext.textContent = 'Passez au Pass Lecteur ou Grand Maître pour bénéficier des 3 boissons offertes chaque semaine.';
+                return;
+            }
+
+            counterText.textContent = `${remainingDrinks} / 3 restantes`;
+            counterText.className = remainingDrinks > 0
+                ? 'text-xs font-extrabold bg-gold text-espresso px-2.5 py-0.5 rounded-full'
+                : 'text-xs font-extrabold bg-red-500/20 text-red-300 border border-red-500/40 px-2.5 py-0.5 rounded-full';
+
+            let barsHtml = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < remainingDrinks) {
+                    barsHtml += `<div class="h-2.5 rounded-full bg-gold transition-all shadow-sm"></div>`;
+                } else {
+                    barsHtml += `<div class="h-2.5 rounded-full bg-white/15 transition-all"></div>`;
+                }
+            }
+            cupsContainer.innerHTML = barsHtml;
+        }
+
+        // Simulate scanning the QR Code at the Barista Counter (-1 free drink)
+        function simulateDrinkScan() {
+            const statusEl = document.getElementById('last-scan-status');
+
+            if (currentTier === 'Pass Le Joueur') {
+                showToast(
+                    'Boissons Non Incluses',
+                    'Le Pass « Le Joueur » donne uniquement accès à la Terrasse de Jeux le soir. Choisissez le Pass Lecteur ou Grand Maître pour les 3 boissons gratuites !',
+                    'warning'
+                );
+                return;
+            }
+
+            if (remainingDrinks > 0) {
+                remainingDrinks--;
+                renderDrinkIndicators();
+                statusEl.textContent = `✓ Boisson validée (${remainingDrinks}/3 restantes)`;
+                showToast(
+                    'Scan Comptoir Réussi ! ☕',
+                    `1 boisson classique gratuite débitée sur votre QR Code. Il vous reste ${remainingDrinks} boisson(s) offerte(s) cette semaine.`
+                );
+            } else {
+                statusEl.textContent = 'Quota hebdomadaire atteint (0/3)';
+                showToast(
+                    'Quota de la Semaine Épuisé',
+                    'Vous avez déjà utilisé vos 3 boissons gratuites cette semaine. Votre compteur se rechargera automatiquement lundi matin !',
+                    'warning'
+                );
+            }
+        }
+
+        // Simulate scanning the QR Code at the Study Sanctuary / Evening Terrace Gate
+        function simulateGateAccess() {
+            const statusEl = document.getElementById('last-scan-status');
+            statusEl.textContent = '✓ Accès Portique Autorisé';
+
+            if (currentTier === 'Pass Le Grand Maître') {
+                showToast(
+                    'Accès Illimité Déverrouillé 🔓',
+                    'Bienvenue ! Votre QR Code vous autorise à étudier/lire dans les poufs géants SANS obligation de consommer, et à accéder gratuitement à la Terrasse de Jeux ce soir.'
+                );
+            } else if (currentTier === 'Pass Le Lecteur') {
+                showToast(
+                    'Accès Bibliothèque & Poufs Géants 🔓',
+                    'Portique ouvert ! Installez-vous dans l\'espace étude ou dans un pouf géant pour lire toute la journée sans aucune obligation d\'achat.'
+                );
+            } else {
+                showToast(
+                    'Accès Terrasse de Jeux Déverrouillé ♟️',
+                    'Bienvenue au Club du Soir ! Vos frais d\'entrée sont supprimés grâce à votre Pass Joueur. Bonne partie d\'Échecs, de Rami ou de Monopoly !'
+                );
+            }
+        }
+
+        // Reset weekly drink counter for repeated classroom demonstrations
+        function resetWeeklyDrinks() {
+            if (currentTier === 'Pass Le Joueur') {
+                document.getElementById('member-tier-select').value = 'Pass Le Grand Maître';
+                updateQRPass();
+            } else {
+                remainingDrinks = 3;
+                renderDrinkIndicators();
+            }
+            document.getElementById('last-scan-status').textContent = 'Compteur remis à 3/3';
+            showToast('Nouvelle Semaine Simulée', 'Vos 3 boissons gratuites hebdomadaires ont été rechargées sur votre QR Code !');
+        }
+    </script>
+</body>
+</html>
